@@ -3,14 +3,18 @@ import axios from "axios";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 
-const VENICE_API_KEY = "qNHgGGkwlhGw_uVLC7Px9hdRpIEaWt1P8DQ2_zIGm8";
+const VENICE_API_KEY = process.env.REACT_APP_VENICE_API_KEY;
 const VENICE_API_URL = "https://api.venice.ai/api/v1/chat/completions";
 
 const NewsSection = ({ category }) => {
   const [news, setNews] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
     const fetchNews = async () => {
+      setLoading(true);
+      setError(null);
       try {
         const response = await axios.post(
           VENICE_API_URL,
@@ -24,8 +28,10 @@ const NewsSection = ({ category }) => {
         );
         setNews(response.data.choices);
       } catch (error) {
+        setError("Failed to load news. Please try again later.");
         console.error("Error fetching news:", error);
       }
+      setLoading(false);
     };
 
     fetchNews();
@@ -34,13 +40,19 @@ const NewsSection = ({ category }) => {
   return (
     <div>
       <h2 className="text-2xl font-bold mb-4">{category} News</h2>
-      {news.map((article, index) => (
-        <Card key={index} className="mb-4">
-          <CardContent>
-            <p>{article.text}</p>
-          </CardContent>
-        </Card>
-      ))}
+      {loading && <p>Loading news...</p>}
+      {error && <p className="text-red-500">{error}</p>}
+      {news.length > 0 ? (
+        news.map((article, index) => (
+          <Card key={index} className="mb-4">
+            <CardContent>
+              <p>{article.text}</p>
+            </CardContent>
+          </Card>
+        ))
+      ) : (
+        !loading && <p>No news available.</p>
+      )}
     </div>
   );
 };
