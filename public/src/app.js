@@ -1,9 +1,7 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
 
-const VENICE_API_KEY = process.env.REACT_APP_VENICE_API_KEY;
+const VENICE_API_KEY = "qNHgGGkwlhGw_uVLC7Px9hdRpIEaWt1P8DQ2_zIGm8";
 const VENICE_API_URL = "https://api.venice.ai/api/v1/chat/completions";
 
 const NewsSection = ({ category }) => {
@@ -26,7 +24,7 @@ const NewsSection = ({ category }) => {
             headers: { Authorization: `Bearer ${VENICE_API_KEY}` },
           }
         );
-        setNews(response.data.choices);
+        setNews(response.data.choices || []);
       } catch (error) {
         setError("Failed to load news. Please try again later.");
         console.error("Error fetching news:", error);
@@ -44,11 +42,9 @@ const NewsSection = ({ category }) => {
       {error && <p className="text-red-500">{error}</p>}
       {news.length > 0 ? (
         news.map((article, index) => (
-          <Card key={index} className="mb-4">
-            <CardContent>
-              <p>{article.text}</p>
-            </CardContent>
-          </Card>
+          <div key={index} className="border p-4 mb-4 bg-white shadow-md">
+            <p>{article.text}</p>
+          </div>
         ))
       ) : (
         !loading && <p>No news available.</p>
@@ -61,12 +57,12 @@ export default function Home() {
   const [category, setCategory] = useState("Unbiased");
 
   return (
-    <div className="p-6 max-w-4xl mx-auto">
+    <div className="p-6 max-w-4xl mx-auto text-center">
       <h1 className="text-4xl font-bold mb-6">Unbiased News Platform</h1>
-      <div className="flex gap-4 mb-6">
-        <Button onClick={() => setCategory("Unbiased")}>Unbiased</Button>
-        <Button onClick={() => setCategory("Left-Leaning")}>Left-Leaning</Button>
-        <Button onClick={() => setCategory("Right-Leaning")}>Right-Leaning</Button>
+      <div className="flex justify-center gap-4 mb-6">
+        <button className="px-4 py-2 bg-blue-500 text-white rounded" onClick={() => setCategory("Unbiased")}>Unbiased</button>
+        <button className="px-4 py-2 bg-green-500 text-white rounded" onClick={() => setCategory("Left-Leaning")}>Left-Leaning</button>
+        <button className="px-4 py-2 bg-red-500 text-white rounded" onClick={() => setCategory("Right-Leaning")}>Right-Leaning</button>
       </div>
       <NewsSection category={category} />
     </div>
